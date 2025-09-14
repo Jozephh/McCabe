@@ -2,6 +2,8 @@ import numpy as np
 import plotly.graph_objects as go
 from scipy.optimize import fsolve
 
+# Original code this is built on: https://colab.research.google.com/drive/1MJpqPV9T2hf0-RuOOeoFKb0ZXvLABr4y?usp=sharing McCabe-Thiele distillation code
+
 # ---------- Equilibrium (constant alpha) ----------
 def calculate_equilibrium_curve(alpha):
     # Build the equilibrium y–x curve assuming constant relative volatility (α).
