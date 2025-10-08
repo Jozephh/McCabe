@@ -4,7 +4,7 @@
 
 from typing import Dict, Tuple
 
-# Paste your NIST Antoine parameters here:
+# Paste NIST Antoine parameters here:
 # Each component: (A, B, C, Tmin_K, Tmax_K)
 # NOTE: Use the *bar/K* set from the NIST page you’re using.
 NIST_ANTOINE: Dict[str, Tuple[float, float, float, float, float]] = {
@@ -40,10 +40,6 @@ def print_table(components, T_K: float, P_bar: float):
         K = Psat / P_bar
         print(f"{comp:16s} {Psat:12.5f} {K:12.5f}")
     # Volatility ranking
-    ranked = sorted(components, key=lambda c: K_value(c, T_K, P_bar), reverse=True)
-    print("\nVolatility ranking (highest K first):")
-    for i, c in enumerate(ranked, 1):
-        print(f"{i:2d}. {c}")
 
 if __name__ == "__main__":
     # --- USER INPUTS ---
