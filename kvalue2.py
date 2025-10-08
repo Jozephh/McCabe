@@ -39,7 +39,6 @@ def print_table(components, T_K: float, P_bar: float):
         Psat = antoine_psat_bar(comp, T_K)
         K = Psat / P_bar
         print(f"{comp:16s} {Psat:12.5f} {K:12.5f}")
-    # Volatility ranking
 
 if __name__ == "__main__":
     # --- USER INPUTS ---
