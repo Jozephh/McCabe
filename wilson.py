@@ -6,7 +6,6 @@ from typing import Optional, Dict
 # =========================
 # Built-in data
 # =========================
-#
 # Antoine constants (bar/K; base-10): log10(P[bar]) = A - B/(T[K] + C)
 # Using your supplied A/B/C exactly, in bar/K, base-10.
 ANTOINE_BAR_K = {
@@ -15,12 +14,12 @@ ANTOINE_BAR_K = {
     "chlorine": {"A": 4.28814, "B": 969.992,  "C": -12.791, "Tmin": 0.0, "Tmax": 1000.0},
     "oxygen":   {"A": 3.85845, "B": 325.675,  "C": -5.667,  "Tmin": 0.0, "Tmax": 1000.0},
     "nitrogen": {"A": 3.7362,  "B": 264.651,  "C": -6.788,  "Tmin": 0.0, "Tmax": 1000.0},
-    # Note: "Hydrochloric Acid" data are commonly used for anhydrous HCl vapor;
-    # keep your Antoine constants as provided.
+
+    # Note: “Hydrochloric Acid” entry refers to anhydrous HCl vapour properties
     "hydrochloric acid": {"A": 4.57389, "B": 868.358,  "C": 1.754,   "Tmin": 0.0, "Tmax": 1000.0},
     "hydrogen chloride": {"A": 4.57389, "B": 868.358,  "C": 1.754,   "Tmin": 0.0, "Tmax": 1000.0},  # alias
 
-    # --- Chlorinated organics & water/CO2 ---
+    # --- Chlorinated organics & others ---
     "1,2-dichloroethane":      {"A": 4.58518, "B": 1521.789, "C": -24.67,  "Tmin": 0.0, "Tmax": 1000.0},
     "1,1,2-trichloroethane":   {"A": 4.06974, "B": 1310.297, "C": -64.41,  "Tmin": 0.0, "Tmax": 1000.0},
     "water":                   {"A": 8.0713,  "B": 1730.63,  "C": 233.43,  "Tmin": 0.0, "Tmax": 1000.0},
@@ -34,34 +33,35 @@ ANTOINE_BAR_K = {
 }
 
 # Critical properties & acentric factors for Wilson (Tc [K], Pc [bar], omega).
-# Tc/Pc prioritized from NIST WebBook & government/standards docs in bar/K.
-# ω from standard tables (Pitzer/Lee–Kesler) or CoolProp where needed.
+# Tc/Pc prioritised from NIST-style data; ω from standard Pitzer/Lee–Kesler tables or CoolProp where needed.
 CRIT_DB = {
     # Light gases
-    "ethylene": {"Tc_K": 282.34, "Pc_bar": 50.41, "acentric": 0.089},      # NIST Tc/Pc; ω tables
-    "chlorine": {"Tc_K": 416.96, "Pc_bar": 79.91, "acentric": 0.070},      # NIST Tc/Pc; ω typical table value
-    "oxygen":   {"Tc_K": 154.58, "Pc_bar": 50.43, "acentric": 0.022},      # NIST Tc/Pc; ω tables
-    "nitrogen": {"Tc_K": 126.19, "Pc_bar": 33.978,"acentric": 0.040},      # NIST Tc/Pc; ω tables
-    "hydrogen chloride": {"Tc_K": 324.6, "Pc_bar": 83.1,  "acentric": 0.12965}, # standard Tc/Pc; ω CoolProp
-    "hydrochloric acid": {"Tc_K": 324.6, "Pc_bar": 83.1,  "acentric": 0.12965}, # alias to HCl
+    "ethylene": {"Tc_K": 282.34, "Pc_bar": 50.41,  "acentric": 0.089},
+    "chlorine": {"Tc_K": 416.96, "Pc_bar": 79.91,  "acentric": 0.070},
+    "oxygen":   {"Tc_K": 154.58, "Pc_bar": 50.43,  "acentric": 0.022},
+    "nitrogen": {"Tc_K": 126.19, "Pc_bar": 33.978, "acentric": 0.040},
+    "hydrogen chloride": {"Tc_K": 324.6, "Pc_bar": 83.1, "acentric": 0.12965},
+    "hydrochloric acid": {"Tc_K": 324.6, "Pc_bar": 83.1, "acentric": 0.12965},  # alias to HCl
 
     # Chlorinated organics & others
-    "1,2-dichloroethane":    {"Tc_K": 561.6, "Pc_bar": 53.8, "acentric": 0.210},  # Tc/Pc: NIST/Wiki; ω typical handbook
-    "1,1,2-trichloroethane": {"Tc_K": 631.0, "Pc_bar": 45.7, "acentric": 0.300},  # standard table values (commonly cited)
-    "water":                 {"Tc_K": 647.096, "Pc_bar": 220.64, "acentric": 0.344}, # NIST WTT; ω standard
-    "carbon dioxide":        {"Tc_K": 304.1282,"Pc_bar": 73.773, "acentric": 0.228}, # NIST; ω standard
-    "vinyl chloride monomer":{"Tc_K": 431.6, "Pc_bar": 53.4, "acentric": 0.122},   # NOAA CHRIS; ω tables
-    "vinyl chloride":        {"Tc_K": 431.6, "Pc_bar": 53.4, "acentric": 0.122},   # alias
-    "chloroethene":          {"Tc_K": 431.6, "Pc_bar": 53.4, "acentric": 0.122},   # alias
-    "acetylene":             {"Tc_K": 308.3, "Pc_bar": 61.4, "acentric": 0.190},   # NIST; ω standard
-    # Assumptions explained in header notes:
-    "butyne":                {"Tc_K": 426.0, "Pc_bar": 41.0, "acentric": 0.250},   # assumed 1-butyne (typical literature values)
-    "1,2-dichloroethylene":  {"Tc_K": 516.0, "Pc_bar": 50.0, "acentric": 0.220},   # assumed trans- isomer, representative values
+    "1,2-dichloroethane":    {"Tc_K": 561.6, "Pc_bar": 53.8,  "acentric": 0.210},
+    "1,1,2-trichloroethane": {"Tc_K": 631.0, "Pc_bar": 45.7,  "acentric": 0.300},
+    "water":                 {"Tc_K": 647.096, "Pc_bar": 220.64, "acentric": 0.344},
+    "carbon dioxide":        {"Tc_K": 304.1282,"Pc_bar": 73.773, "acentric": 0.228},
+    "vinyl chloride monomer":{"Tc_K": 431.6, "Pc_bar": 53.4,  "acentric": 0.122},
+    "vinyl chloride":        {"Tc_K": 431.6, "Pc_bar": 53.4,  "acentric": 0.122},  # alias
+    "chloroethene":          {"Tc_K": 431.6, "Pc_bar": 53.4,  "acentric": 0.122},  # alias
+    "acetylene":             {"Tc_K": 308.3, "Pc_bar": 61.4,  "acentric": 0.190},
+    # Assumptions explained previously:
+    "butyne":                {"Tc_K": 426.0, "Pc_bar": 41.0,  "acentric": 0.250},  # assumed 1-butyne
+    "1,2-dichloroethylene":  {"Tc_K": 516.0, "Pc_bar": 50.0,  "acentric": 0.220},  # assumed trans-
 }
 
 # =========================
 # Utility functions
 # =========================
+
+#Returns PSat in bar
 def antoine_psat_bar(component: str, T_K: float) -> float:
     comp = component.lower()
     if comp not in ANTOINE_BAR_K:
@@ -71,13 +71,17 @@ def antoine_psat_bar(component: str, T_K: float) -> float:
     C = ANTOINE_BAR_K[comp]["C"]
     return 10 ** (A - B / (T_K + C))
 
+# Raoult's method
 def k_raoult(component: str, T_K: float, P_bar: float) -> float:
     return antoine_psat_bar(component, T_K) / P_bar
 
+# Wilson's method
 def k_wilson(component: str, T_K: float, P_bar: float) -> float:
     comp = component.lower()
     if comp not in CRIT_DB:
-        raise KeyError(f"Critical data for '{component}' not in database. Add to CRIT_DB.")
+        # Helpful hint: show close names if there’s a typo
+        known = ", ".join(sorted(CRIT_DB.keys()))
+        raise KeyError(f"Critical data for '{component}' not in database. Try one of: {known}")
     Tc = CRIT_DB[comp]["Tc_K"]
     Pc = CRIT_DB[comp]["Pc_bar"]
     omega = CRIT_DB[comp]["acentric"]
@@ -89,7 +93,7 @@ def load_json(path: str) -> Dict:
         return json.load(f)
 
 def k_value(component: str, T: float, P: float, method: str = "wilson",
-            units: str = "barK", coeffs_path: Optional[str] = None) -> float:
+            units: str = "barK") -> float:
     if units != "barK":
         raise ValueError("This script expects P in bar and T in K (units='barK').")
     if method == "raoult":
@@ -102,7 +106,7 @@ def k_value(component: str, T: float, P: float, method: str = "wilson",
 def main():
     ap = argparse.ArgumentParser(description="Compute K-values (Raoult/Wilson).")
     ap.add_argument("--component", required=True,
-                    help="e.g., ethylene, chlorine, vinyl chloride, 1,2-dichloroethane, etc.")
+                    help="e.g., ethylene, chlorine, vinyl chloride, 1,2-dichloroethane, acetylene, etc.")
     ap.add_argument("--T", type=float, required=True, help="Temperature [K]")
     ap.add_argument("--P", type=float, required=True, help="Pressure [bar]")
     ap.add_argument("--method", choices=["raoult", "wilson"], default="wilson")
