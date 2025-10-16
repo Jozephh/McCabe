@@ -10,26 +10,52 @@ from typing import Optional, Dict
 # Using your supplied A/B/C exactly, in bar/K, base-10.
 ANTOINE_BAR_K = {
     # --- Gases / light species ---
-    "ethylene": {"A": 3.87261, "B": 584.146,  "C": -18.307, "Tmin": 0.0, "Tmax": 1000.0},
-    "chlorine": {"A": 4.28814, "B": 969.992,  "C": -12.791, "Tmin": 0.0, "Tmax": 1000.0},
-    "oxygen":   {"A": 3.85845, "B": 325.675,  "C": -5.667,  "Tmin": 0.0, "Tmax": 1000.0},
-    "nitrogen": {"A": 3.7362,  "B": 264.651,  "C": -6.788,  "Tmin": 0.0, "Tmax": 1000.0},
+    # Range (NIST, bar/K row that matches these A/B/C): 149.37–188.57 K
+    "ethylene": {"A": 3.87261, "B": 584.146,  "C": -18.307, "Tmin": 149.37, "Tmax": 188.57},  # NIST Michels & Wassenaar
 
-    # Note: “Hydrochloric Acid” entry refers to anhydrous HCl vapour properties
-    "hydrochloric acid": {"A": 4.57389, "B": 868.358,  "C": 1.754,   "Tmin": 0.0, "Tmax": 1000.0},
-    "hydrogen chloride": {"A": 4.57389, "B": 868.358,  "C": 1.754,   "Tmin": 0.0, "Tmax": 1000.0},  # alias
+    # Chlorine has multiple Antoine rows; these A/B/C correspond to the high-T set.
+    # Range (NIST): 239.4–400.3 K
+    "chlorine": {"A": 4.28814, "B": 969.992,  "C": -12.791, "Tmin": 239.4, "Tmax": 400.3},    # NIST Stull high-T set
+
+    # Range (NIST): 54.36–100.16 K (row that matches these A/B/C)
+    "oxygen":   {"A": 3.85845, "B": 325.675,  "C": -5.667,  "Tmin": 54.36, "Tmax": 100.16},   # NIST Brower & Thodos
+
+    # Range (NIST): 63.14–126.0 K (row that matches these A/B/C)
+    "nitrogen": {"A": 3.7362,  "B": 264.651,  "C": -6.788,  "Tmin": 63.14, "Tmax": 126.0},    # NIST Edejer & Thodos
+
+    # Note: “Hydrochloric Acid” here refers to anhydrous HCl vapour properties (alias to hydrogen chloride).
+    # Range (NIST, high-T row that matches these A/B/C): 188.3–309.4 K
+    "hydrochloric acid": {"A": 4.57389, "B": 868.358,  "C": 1.754,   "Tmin": 188.3, "Tmax": 309.4},
+    "hydrogen chloride": {"A": 4.57389, "B": 868.358,  "C": 1.754,   "Tmin": 188.3, "Tmax": 309.4},  # alias
 
     # --- Chlorinated organics & others ---
-    "1,2-dichloroethane":      {"A": 4.58518, "B": 1521.789, "C": -24.67,  "Tmin": 0.0, "Tmax": 1000.0},
-    "1,1,2-trichloroethane":   {"A": 4.06974, "B": 1310.297, "C": -64.41,  "Tmin": 0.0, "Tmax": 1000.0},
-    "water":                   {"A": 8.0713,  "B": 1730.63,  "C": 233.43,  "Tmin": 0.0, "Tmax": 1000.0},
-    "carbon dioxide":          {"A": 6.9758,  "B": 1347.79,  "C": 273.0,   "Tmin": 0.0, "Tmax": 1000.0},
-    "vinyl chloride monomer":  {"A": 3.98598, "B": 892.757,  "C": -35.051, "Tmin": 0.0, "Tmax": 1000.0},
-    "vinyl chloride":          {"A": 3.98598, "B": 892.757,  "C": -35.051, "Tmin": 0.0, "Tmax": 1000.0},  # alias
-    "chloroethene":            {"A": 3.98598, "B": 892.757,  "C": -35.051, "Tmin": 0.0, "Tmax": 1000.0},  # alias
-    "acetylene":               {"A": 4.66141, "B": 909.079,  "C": 7.947,   "Tmin": 0.0, "Tmax": 1000.0},
-    "butyne":                  {"A": 4.2402,  "B": 1046.879, "C": -33.951, "Tmin": 0.0, "Tmax": 1000.0},   # assumed 1-butyne
-    "1,2-dichloroethylene":    {"A": 4.069,   "B": 1163.729, "C": -47.174, "Tmin": 0.0, "Tmax": 1000.0},  # assumed trans-
+    # Range (NIST): 242.33–372.60 K
+    "1,2-dichloroethane":      {"A": 4.58518, "B": 1521.789, "C": -24.67,  "Tmin": 242.33, "Tmax": 372.60},
+
+    # Range (NIST): 323.12–386.82 K
+    "1,1,2-trichloroethane":   {"A": 4.06974, "B": 1310.297, "C": -64.41,  "Tmin": 323.12, "Tmax": 386.82},
+
+    # Water note: your A/B/C correspond to the classic 1–100 °C set (°C, mmHg in many sources).
+    # Here we keep your A/B/C as-is (per your request); the **range only** is expressed in kelvin: 274.15–373.15 K.
+    "water":                   {"A": 8.0713,  "B": 1730.63,  "C": 233.43,  "Tmin": 274.15, "Tmax": 373.15},
+
+    # CO2 note: your A/B/C are not the same as the NIST bar/K set.
+    # We include the NIST bar/K range (154.26–195.89 K) as a conservative validity check.
+    "carbon dioxide":          {"A": 6.9758,  "B": 1347.79,  "C": 273.0,   "Tmin": 154.26, "Tmax": 195.89},
+
+    # Range (NIST): 163.13–252.75 K
+    "vinyl chloride monomer":  {"A": 3.98598, "B": 892.757,  "C": -35.051, "Tmin": 163.13, "Tmax": 252.75},
+    "vinyl chloride":          {"A": 3.98598, "B": 892.757,  "C": -35.051, "Tmin": 163.13, "Tmax": 252.75},  # alias
+    "chloroethene":            {"A": 3.98598, "B": 892.757,  "C": -35.051, "Tmin": 163.13, "Tmax": 252.75},  # alias
+
+    # Range (NIST, matching row): 214.64–308.33 K
+    "acetylene":               {"A": 4.66141, "B": 909.079,  "C": 7.947,   "Tmin": 214.64, "Tmax": 308.33},
+
+    # “butyne” assumed 1-butyne; range (NIST): 150.20–201.63 K
+    "butyne":                  {"A": 4.2402,  "B": 1046.879, "C": -33.951, "Tmin": 150.20, "Tmax": 201.63},
+
+    # Your coefficients match the (Z) (cis) isomer; range (NIST): 273.91–356.78 K
+    "1,2-dichloroethylene":    {"A": 4.069,   "B": 1163.729, "C": -47.174, "Tmin": 273.91, "Tmax": 356.78},
 }
 
 # Critical properties & acentric factors for Wilson (Tc [K], Pc [bar], omega).
@@ -79,7 +105,7 @@ def k_raoult(component: str, T_K: float, P_bar: float) -> float:
 def k_wilson(component: str, T_K: float, P_bar: float) -> float:
     comp = component.lower()
     if comp not in CRIT_DB:
-        # Helpful hint: show close names if there’s a typo
+        # show close names if there’s a typo
         known = ", ".join(sorted(CRIT_DB.keys()))
         raise KeyError(f"Critical data for '{component}' not in database. Try one of: {known}")
     Tc = CRIT_DB[comp]["Tc_K"]
@@ -104,7 +130,7 @@ def k_value(component: str, T: float, P: float, method: str = "wilson",
         raise ValueError("Unknown method. Use 'raoult' or 'wilson'.")
 
 def main():
-    ap = argparse.ArgumentParser(description="Compute K-values (Raoult/Wilson).")
+    ap = argparse.ArgumentParser(description="Compute K-values (Wilson/Raoult).")
     ap.add_argument("--component", required=True,
                     help="e.g., ethylene, chlorine, vinyl chloride, 1,2-dichloroethane, acetylene, etc.")
     ap.add_argument("--T", type=float, required=True, help="Temperature [K]")
@@ -113,6 +139,15 @@ def main():
     args = ap.parse_args()
     K = k_value(args.component, args.T, args.P, method=args.method)
     print(f"K({args.component}, T={args.T} K, P={args.P} bar, method={args.method}) = {K:.6g}")
+
+    # Added: warn if the calculation temperature is outside the Antoine validity range for this component.
+    comp = args.component.lower()
+    if comp in ANTOINE_BAR_K:
+        Tmin = ANTOINE_BAR_K[comp].get("Tmin", None)
+        Tmax = ANTOINE_BAR_K[comp].get("Tmax", None)
+        if (Tmin is not None and args.T < Tmin) or (Tmax is not None and args.T > Tmax):
+            print(f"WARNING: T={args.T} K is outside the Antoine validity range for {args.component} "
+                  f"[{Tmin}–{Tmax}] K. Raoult-based Psat/K-values may be unreliable.")
 
 if __name__ == "__main__":
     main()
